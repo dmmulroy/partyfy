@@ -38,19 +38,6 @@ async function main() {
 
     image.greyscale();
 
-    if (image.hasAlpha()) {
-      image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
-        const transparent = image.bitmap.data[idx + 3] < 1;
-
-        if (transparent) {
-          image.bitmap.data[idx + 0] = 0;
-          image.bitmap.data[idx + 1] = 255;
-          image.bitmap.data[idx + 2] = 0;
-          image.bitmap.data[idx + 3] = 0;
-        }
-      });
-    }
-
     const gifEncoder = new GifEncoder(image.bitmap.width, image.bitmap.height);
 
     gifEncoder.pipe(
