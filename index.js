@@ -35,7 +35,7 @@ function partyfy(inputStream, outputStream, options = {}) {}
 async function main() {
   try {
     const image = await Jimp.read(
-      path.join(__dirname, 'input_images', 'input.png')
+      path.join(__dirname, 'input_images', 'urwelcome.jpg')
     );
 
     image.greyscale();
@@ -43,7 +43,9 @@ async function main() {
     const gifEncoder = new GifEncoder(image.bitmap.width, image.bitmap.height);
 
     gifEncoder.pipe(
-      fs.createWriteStream(path.join(__dirname, 'output_images', 'output.png'))
+      fs.createWriteStream(
+        path.join(__dirname, 'output_images', 'urwelcome.png')
+      )
     );
     gifEncoder.setDelay(75);
 
@@ -89,5 +91,3 @@ async function main() {
 }
 
 main();
-
-export default partyfy;
