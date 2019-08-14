@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+  - "10"
+  - "8"
+  - "6"
+
+notifications:
+  email:
+    recipients:
+      - todd@twolfson.com
+    on_success: change
+    on_failure: change
