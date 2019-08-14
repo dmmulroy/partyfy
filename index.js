@@ -38,12 +38,25 @@ async function main() {
 
     image.greyscale();
 
+    if (image.hasAlpha()) {
+      image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
+        const transparent = image.bitmap.data[idx + 3] < 1;
+
+        if (transparent) {
+          image.bitmap.data[idx + 0] = 0;
+          image.bitmap.data[idx + 1] = 255;
+          image.bitmap.data[idx + 2] = 0;
+          image.bitmap.data[idx + 3] = 0;
+        }
+      });
+    }
+
     const gifEncoder = new GifEncoder(image.bitmap.width, image.bitmap.height);
 
     gifEncoder.pipe(
       fs.createWriteStream(path.join(__dirname, 'output_images', 'output.png'))
     );
-    gifEncoder.setDelay(100);
+    gifEncoder.setDelay(75);
 
     gifEncoder.setRepeat(0); // loop forever
 
@@ -56,7 +69,21 @@ async function main() {
     colors.forEach(color => {
       const clonedImage = image.clone();
 
-      clonedImage.color([{ apply: 'mix', params: [color] }]);
+      clonedImage.scan(
+        0,
+        0,
+        clonedImage.bitmap.width,
+        clonedImage.bitmap.height,
+        (x, y, idx) => {
+          const transparent = clonedImage.bitmap.data[idx + 3] < 1;
+
+          if (transparent) {
+            clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
+          } else {
+            clonedImage.setPixelColor(Jimp.cssColorToHex(color), x, y);
+          }
+        }
+      );
 
       gifEncoder.addFrame(clonedImage.bitmap.data);
       gifEncoder.flushData();
