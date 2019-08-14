@@ -56,21 +56,25 @@ async function main() {
     colors.forEach(color => {
       const clonedImage = image.clone();
 
-      clonedImage.scan(
-        0,
-        0,
-        clonedImage.bitmap.width,
-        clonedImage.bitmap.height,
-        (x, y, idx) => {
-          const transparent = clonedImage.bitmap.data[idx + 3] < 1;
+      if (clonedImage.hasAlpha()) {
+        clonedImage.scan(
+          0,
+          0,
+          clonedImage.bitmap.width,
+          clonedImage.bitmap.height,
+          (x, y, idx) => {
+            const transparent = clonedImage.bitmap.data[idx + 3] < 1;
 
-          if (transparent) {
-            clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
-          } else {
-            clonedImage.setPixelColor(Jimp.cssColorToHex(color), x, y);
+            if (transparent) {
+              clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
+            } else {
+              clonedImage.setPixelColor(Jimp.cssColorToHex(color), x, y);
+            }
           }
-        }
-      );
+        );
+      } else {
+        clonedImage.color([{ apply: 'mix', params: [color] }]);
+      }
 
       gifEncoder.addFrame(clonedImage.bitmap.data);
       gifEncoder.flushData();
