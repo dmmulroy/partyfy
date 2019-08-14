@@ -30,6 +30,8 @@ const colors = [
 //   [255, 105, 104]
 // ];
 
+function partyfy(inputStream, outputStream, options = {}) {}
+
 async function main() {
   try {
     const image = await Jimp.read(
@@ -87,3 +89,5 @@ async function main() {
 }
 
 main();
+
+export default partyfy;
