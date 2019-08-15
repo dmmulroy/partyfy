@@ -38,7 +38,7 @@ function mix(color, overlayedColor, opacity = 50) {
   };
 }
 
-async function partyfy(inputBuffer, outputStream, options = {}) {
+async function partyfy(inputStream, outputStream, options = {}) {
   try {
     const image = await Jimp.read(inputStream);
 
