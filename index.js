@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs');
 
 const Jimp = require('jimp');
-const GifEncoder = require('gif-encoder');
+const GifEncoderLib = require('gif-encoder');
 
 const colors = [
   '#ff8d8b',
@@ -38,25 +38,27 @@ function mix(color, overlayedColor, opacity = 50) {
   };
 }
 
-async function partyfy(inputStream, outputStream, options = {}) {
+function gifEncoderToBuffer(gifEncoder) {
+  return new Promise((resolve, reject) => {
+    let buffers = [];
+
+    gifEncoder.on('error', reject);
+
+    gifEncoder.on('data', buffer => buffers.push(buffer));
+
+    gifEncoder.on('end', () => {
+      resolve(Buffer.concat(buffers));
+    });
+  });
+}
+
+async function partyfy(imageBuffer, options = {}) {
   try {
-    const image = await Jimp.read(inputStream);
+    const image = await Jimp.read(imageBuffer);
 
     image.greyscale();
 
     const gifEncoder = new GifEncoder(image.bitmap.width, image.bitmap.height);
-
-    gifEncoder.pipe(outputStream);
-
-    gifEncoder.setDelay(75);
-
-    gifEncoder.setRepeat(0); // loop forever
-
-    gifEncoder.setTransparent('0x00FF00');
-
-    gifEncoder.writeHeader();
-
-    gifEncoder.on('readable', gifEncoder.read);
 
     colors.forEach(color => {
       const clonedImage = image.clone();
@@ -86,10 +88,13 @@ async function partyfy(inputStream, outputStream, options = {}) {
       );
 
       gifEncoder.addFrame(clonedImage.bitmap.data);
-      gifEncoder.flushData();
+      // gifEncoder.flushData();
     });
 
     gifEncoder.finish();
+
+    // return gifEncoderToBuffer(gifEncoder);
+    return gifEncoder.getBuffer();
   } catch (err) {
     console.error(err);
 
@@ -103,16 +108,50 @@ async function main() {
       path.join(__dirname, 'input_images', 'input.png')
     );
 
-    console.log(imageFile);
+    const partyImage = await partyfy(imageFile);
 
-    const ouptputFile = fs.createWriteStream(
-      path.join(__dirname, 'output_images', 'output.png')
+    fs.writeFileSync(
+      path.join(__dirname, 'output_images', 'output.png'),
+      partyImage
     );
-
-    await partyfy(imageFile, ouptputFile);
   } catch (err) {
     console.log(err);
   }
 }
 
 main();
+
+class GifEncoder extends GifEncoderLib {
+  constructor(...args) {
+    super(...args);
+
+    this.buffer = new Promise((resolve, reject) => {
+      let buffers = [];
+
+      this.on('error', reject);
+
+      this.on('data', buffer => buffers.push(buffer));
+
+      this.on('end', () => {
+        resolve(Buffer.concat(buffers));
+      });
+    });
+
+    this.setDelay(75);
+
+    this.setRepeat(0); // loop forever
+
+    this.setTransparent('0x00FF00');
+
+    this.writeHeader();
+  }
+
+  addFrame(...args) {
+    super.addFrame(...args);
+    this.flushData();
+  }
+
+  async getBuffer() {
+    return this.buffer;
+  }
+}
