@@ -81,12 +81,10 @@ async function partyfy(imageBuffer, options = {}) {
         );
 
         gifEncoder.addFrame(clonedImage.bitmap.data);
-        // gifEncoder.flushData();
       });
 
       gifEncoder.finish();
 
-      // return gifEncoderToBuffer(gifEncoder);
       return gifEncoder.getBuffer();
     }
   } catch (err) {
