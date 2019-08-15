@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const Jimp = require('jimp');
 const GifEncoderLib = require('gif-encoder');
+const { GifUtil } = require('gifwrap');
 
 const colors = [
   '#ff8d8b',
@@ -44,43 +45,50 @@ async function partyfy(imageBuffer, options = {}) {
 
     image.greyscale();
 
-    const gifEncoder = new GifEncoder(image.bitmap.width, image.bitmap.height);
-
-    colors.forEach(color => {
-      const clonedImage = image.clone();
-
-      clonedImage.scan(
-        0,
-        0,
-        clonedImage.bitmap.width,
-        clonedImage.bitmap.height,
-        (x, y, idx) => {
-          const transparent = clonedImage.bitmap.data[idx + 3] < 1;
-
-          if (transparent) {
-            clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
-          } else {
-            const currentColor = Jimp.intToRGBA(
-              clonedImage.getPixelColor(x, y)
-            );
-
-            const partyColor = Jimp.intToRGBA(Jimp.cssColorToHex(color));
-
-            const { r, g, b, a = 1 } = mix(currentColor, partyColor);
-
-            clonedImage.setPixelColor(Jimp.rgbaToInt(r, g, b, a), x, y);
-          }
-        }
+    if (image.getMIME() === Jimp.MIME_GIF) {
+      GifUtil.read(imageBuffer).then(gif => console.log(gif.frames.length));
+    } else {
+      const gifEncoder = new GifEncoder(
+        image.bitmap.width,
+        image.bitmap.height
       );
 
-      gifEncoder.addFrame(clonedImage.bitmap.data);
-      // gifEncoder.flushData();
-    });
+      colors.forEach(color => {
+        const clonedImage = image.clone();
 
-    gifEncoder.finish();
+        clonedImage.scan(
+          0,
+          0,
+          clonedImage.bitmap.width,
+          clonedImage.bitmap.height,
+          (x, y, idx) => {
+            const transparent = clonedImage.bitmap.data[idx + 3] < 1;
 
-    // return gifEncoderToBuffer(gifEncoder);
-    return gifEncoder.getBuffer();
+            if (transparent) {
+              clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
+            } else {
+              const currentColor = Jimp.intToRGBA(
+                clonedImage.getPixelColor(x, y)
+              );
+
+              const partyColor = Jimp.intToRGBA(Jimp.cssColorToHex(color));
+
+              const { r, g, b, a = 1 } = mix(currentColor, partyColor);
+
+              clonedImage.setPixelColor(Jimp.rgbaToInt(r, g, b, a), x, y);
+            }
+          }
+        );
+
+        gifEncoder.addFrame(clonedImage.bitmap.data);
+        // gifEncoder.flushData();
+      });
+
+      gifEncoder.finish();
+
+      // return gifEncoderToBuffer(gifEncoder);
+      return gifEncoder.getBuffer();
+    }
   } catch (err) {
     console.error(err);
 
@@ -91,13 +99,13 @@ async function partyfy(imageBuffer, options = {}) {
 async function main() {
   try {
     const imageFile = fs.readFileSync(
-      path.join(__dirname, 'input_images', 'partysob.png')
+      path.join(__dirname, 'input_images', 'dope2.png')
     );
 
     const partyImage = await partyfy(imageFile);
 
     fs.writeFileSync(
-      path.join(__dirname, 'output_images', 'partysob.png'),
+      path.join(__dirname, 'output_images', 'dope2.png'),
       partyImage
     );
   } catch (err) {
