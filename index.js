@@ -38,20 +38,6 @@ function mix(color, overlayedColor, opacity = 50) {
   };
 }
 
-function gifEncoderToBuffer(gifEncoder) {
-  return new Promise((resolve, reject) => {
-    let buffers = [];
-
-    gifEncoder.on('error', reject);
-
-    gifEncoder.on('data', buffer => buffers.push(buffer));
-
-    gifEncoder.on('end', () => {
-      resolve(Buffer.concat(buffers));
-    });
-  });
-}
-
 async function partyfy(imageBuffer, options = {}) {
   try {
     const image = await Jimp.read(imageBuffer);
