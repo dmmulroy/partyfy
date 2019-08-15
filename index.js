@@ -137,7 +137,7 @@ class GifEncoder extends GifEncoderLib {
     this.flushData();
   }
 
-  async getBuffer() {
+  getBuffer() {
     return this.buffer;
   }
 }
