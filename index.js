@@ -91,13 +91,13 @@ async function partyfy(imageBuffer, options = {}) {
 async function main() {
   try {
     const imageFile = fs.readFileSync(
-      path.join(__dirname, 'input_images', 'input.png')
+      path.join(__dirname, 'input_images', 'partysob.png')
     );
 
     const partyImage = await partyfy(imageFile);
 
     fs.writeFileSync(
-      path.join(__dirname, 'output_images', 'output.png'),
+      path.join(__dirname, 'output_images', 'partysob.png'),
       partyImage
     );
   } catch (err) {
