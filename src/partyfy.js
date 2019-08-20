@@ -74,3 +74,5 @@ async function partyfy(imageBuffer, options = {}) {
     throw new Error(`partyfy error: ${err}`);
   }
 }
+
+module.exports = partyfy;
