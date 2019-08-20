@@ -77,22 +77,3 @@ async function partyfy(imageBuffer, options = {}) {
     throw new Error(`partyfy error: ${err}`);
   }
 }
-
-async function main() {
-  try {
-    const imageFile = fs.readFileSync(
-      path.join(__dirname, 'input_images', 'twerkfinity.gif')
-    );
-
-    const partyImage = await partyfy(imageFile);
-
-    fs.writeFileSync(
-      path.join(__dirname, 'output_images', 'twerkfinity.gif'),
-      partyImage
-    );
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-main();
