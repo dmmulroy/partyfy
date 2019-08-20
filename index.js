@@ -2,10 +2,6 @@ const path = require('path');
 const fs = require('fs');
 
 const Jimp = require('jimp');
-<<<<<<< HEAD
-=======
-const GifEncoderLib = require('gif-encoder');
->>>>>>> d50ef4cbf48c93198244767d0145ae1dd974c5d8
 const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
 
 const colors = [
