@@ -1,6 +1,3 @@
-const path = require('path');
-const fs = require('fs');
-
 const Jimp = require('jimp');
 const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
 
