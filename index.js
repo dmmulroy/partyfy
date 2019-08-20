@@ -3,7 +3,7 @@ const fs = require('fs');
 
 const Jimp = require('jimp');
 const GifEncoderLib = require('gif-encoder');
-const { GifUtil } = require('gifwrap');
+const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
 
 const colors = [
   '#ff8d8b',
@@ -31,13 +31,15 @@ const rgbColors = [
   [255, 105, 104]
 ];
 
-function mix(color, overlayedColor, opacity = 50) {
+function mix(color, overlayedColor, opacity = 55) {
   return {
     r: (overlayedColor.r - color.r) * (opacity / 100) + color.r,
     g: (overlayedColor.g - color.g) * (opacity / 100) + color.g,
     b: (overlayedColor.b - color.b) * (opacity / 100) + color.b
   };
 }
+
+const codec = new GifCodec();
 
 async function partyfy(imageBuffer, options = {}) {
   try {
@@ -48,10 +50,11 @@ async function partyfy(imageBuffer, options = {}) {
     if (image.getMIME() === Jimp.MIME_GIF) {
       GifUtil.read(imageBuffer).then(gif => console.log(gif.frames.length));
     } else {
-      const gifEncoder = new GifEncoder(
-        image.bitmap.width,
-        image.bitmap.height
-      );
+      // const gifEncoder = new GifEncoder(
+      //   image.bitmap.width,
+      //   image.bitmap.height
+      // );
+      const frames = [];
 
       colors.forEach(color => {
         const clonedImage = image.clone();
@@ -65,7 +68,7 @@ async function partyfy(imageBuffer, options = {}) {
             const transparent = clonedImage.bitmap.data[idx + 3] < 1;
 
             if (transparent) {
-              clonedImage.setPixelColor(Jimp.rgbaToInt(0, 255, 0, 0), x, y);
+              clonedImage.setPixelColor(0x00, x, y);
             } else {
               const currentColor = Jimp.intToRGBA(
                 clonedImage.getPixelColor(x, y)
@@ -80,12 +83,16 @@ async function partyfy(imageBuffer, options = {}) {
           }
         );
 
-        gifEncoder.addFrame(clonedImage.bitmap.data);
+        frames.push(new GifFrame(clonedImage.bitmap, { delayCentisecs: 7.5 }));
+        // gifEncoder.addFrame(clonedImage.bitmap.data);
       });
 
-      gifEncoder.finish();
+      // gifEncoder.finish();
 
-      return gifEncoder.getBuffer();
+      const { buffer } = await codec.encodeGif(frames, {
+        useTransparency: true
+      });
+      return buffer;
     }
   } catch (err) {
     console.error(err);
@@ -97,13 +104,13 @@ async function partyfy(imageBuffer, options = {}) {
 async function main() {
   try {
     const imageFile = fs.readFileSync(
-      path.join(__dirname, 'input_images', 'dope2.png')
+      path.join(__dirname, 'input_images', 'docker.png')
     );
 
     const partyImage = await partyfy(imageFile);
 
     fs.writeFileSync(
-      path.join(__dirname, 'output_images', 'dope2.png'),
+      path.join(__dirname, 'output_images', 'docker.png'),
       partyImage
     );
   } catch (err) {
