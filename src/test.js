@@ -1,11 +1,7 @@
-const partyfy = require('./index.js');
+const partyfy = require('./partyfy');
 
 async function main() {
-<<<<<<< HEAD
   const [, , inputFile, outputFile] = process.argv;
-=======
-  const [,, inputFile, outputFile]
->>>>>>> f01b35b0a8dbcbd2d5c029fc3dbae2b4a0cfff3c
   try {
     const imageFile = fs.readFileSync(
       path.join(__dirname, 'input_images', inputFile)
