@@ -1,6 +1,10 @@
 const Jimp = require('jimp');
 const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
 
+const codec = new GifCodec();
+
+const TRANSPARENT_HEX = 0x00;
+
 const colors = [
   { r: 255, g: 141, b: 139, a: 1 },
   { r: 254, g: 214, b: 137, a: 1 },
@@ -14,23 +18,16 @@ const colors = [
   { r: 255, g: 105, b: 104, a: 1 }
 ];
 
-function mix(color, overlayedColor, opacity = 60) {
-  return {
-    r: (overlayedColor.r - color.r) * (opacity / 100) + color.r,
-    g: (overlayedColor.g - color.g) * (opacity / 100) + color.g,
-    b: (overlayedColor.b - color.b) * (opacity / 100) + color.b,
-    a: 1
-  };
-}
+const defaultOptions = {
+  overlayOpacity: 65,
+  frameDelay: 75
+};
 
-const codec = new GifCodec();
-
-async function partyfy(imageBuffer, options = {}) {
+async function partyfy(imageBuffer, options = defaultOptions) {
   try {
     const image = await Jimp.read(imageBuffer);
     const frames = [];
-
-    image.greyscale();
+    const opts = { ...defaultOptions, ...options };
 
     if (image.getMIME() === Jimp.MIME_GIF) {
       const gif = await GifUtil.read(imageBuffer);
@@ -38,6 +35,8 @@ async function partyfy(imageBuffer, options = {}) {
       if (gif.frames.length > 1)
         throw new Error('animated gifs are not currently supported');
     }
+
+    image.greyscale();
 
     colors.forEach(partyColor => {
       const clonedImage = image.clone();
@@ -51,28 +50,53 @@ async function partyfy(imageBuffer, options = {}) {
           const isTransparent = clonedImage.bitmap.data[idx + 3] < 1;
 
           if (isTransparent) {
-            clonedImage.setPixelColor(0x00, x, y);
+            clonedImage.setPixelColor(TRANSPARENT_HEX, x, y);
           } else {
             const currentColor = Jimp.intToRGBA(
               clonedImage.getPixelColor(x, y)
             );
 
-            const { r, g, b, a } = mix(currentColor, partyColor);
+            const { r, g, b, a } = mix(
+              currentColor,
+              partyColor,
+              opts.overlayOpacity
+            );
 
             clonedImage.setPixelColor(Jimp.rgbaToInt(r, g, b, a), x, y);
           }
         }
       );
 
-      frames.push(new GifFrame(clonedImage.bitmap, { delayCentisecs: 7.5 }));
+      frames.push(
+        new GifFrame(clonedImage.bitmap, {
+          delayCentisecs: msToCs(opts.frameDelay)
+        })
+      );
     });
 
     const { buffer } = await codec.encodeGif(frames);
 
     return buffer;
   } catch (err) {
-    throw new Error(`partyfy error: ${err}`);
+    throw new Error(`partyfy error: ${err.message || err}`);
   }
+}
+
+function mix(color, overlayedColor, opacity = 60) {
+  return {
+    r: (overlayedColor.r - color.r) * (opacity / 100) + color.r,
+    g: (overlayedColor.g - color.g) * (opacity / 100) + color.g,
+    b: (overlayedColor.b - color.b) * (opacity / 100) + color.b,
+    a: 1
+  };
+}
+
+function msToCs(ms) {
+  return ms / 10;
+}
+
+function csToMs(cs) {
+  return cs * 10;
 }
 
 module.exports = partyfy;
