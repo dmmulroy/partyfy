@@ -19,7 +19,7 @@ const colors = [
 ];
 
 const defaultOptions = {
-  overlayOpacity: 65,
+  overlayOpacity: 60,
   frameDelay: 75
 };
 
