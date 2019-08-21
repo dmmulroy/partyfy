@@ -2,7 +2,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const partyfy = require('../src/partyfy');
+const partyfy = require('../dist/partyfy.cjs');
 
 (async () => {
   const [, , inputFile, outputFile] = process.argv;
