@@ -1,5 +1,6 @@
 {
-  "version": "0.0.1",
+  "name": "partyfy",
+  "version": "0.0.2",
   "description": "Library to generate party emojis",
   "main": "dist/partyfy.cjs.js",
   "module": "dist/partyfy.esm.js",
