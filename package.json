@@ -2,7 +2,7 @@
   "name": "partyfy",
   "version": "0.0.2",
   "description": "Library to generate party emojis",
-  "main": "dist/partyfy.js",
+  "main": "dist/partyfy.cjs.js",
   "module": "dist/partyfy.esm.js",
   "source": "src/partyfy.js",
   "author": "Dillon Mulroy",
