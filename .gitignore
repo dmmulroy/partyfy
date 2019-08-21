@@ -96,4 +96,7 @@ typings/
 input_images/
 output_images/
 
+# dist
+dist/
+
 # End of https://www.gitignore.io/api/node

@@ -1,8 +1,8 @@
 {
   "version": "0.0.1",
   "description": "Library to generate party emojis",
-  "main": "dist/how-long-till-lunch.cjs.js",
-  "module": "dist/how-long-till-lunch.esm.js",
+  "main": "dist/partyfy.cjs.js",
+  "module": "dist/partyfy.esm.js",
   "author": "Dillon Mulroy",
   "license": "MIT",
   "repository": {
@@ -21,6 +21,7 @@
   "devDependencies": {
     "rollup": "^1.19.4",
     "rollup-plugin-commonjs": "^10.0.2",
+    "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.2.0"
   },
   "files": [
