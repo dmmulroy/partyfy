@@ -24,7 +24,7 @@ const partyfy = require('partyfy');
 
   const partyImage = await partyfy(image);
 
-  fs.writeFileSynce('my-party-image.gif');
+  fs.writeFileSync('my-party-image.gif');
 })();
 ```
 
