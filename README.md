@@ -8,8 +8,8 @@
 
   * file <Buffer>
   * options <Object>
-   * frameDelay <number>
-   * overlayOpacity <number>
+    * frameDelay <number>
+    * overlayOpacity <number>
   
   Returns <Promise\<Buffer\>>
  
