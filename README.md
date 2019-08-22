@@ -4,6 +4,17 @@
 
 ## Usage
 
+### `partyfy(file[, options])`
+
+  * file <Buffer>
+  * options <Object>
+   * frameDelay <number>
+   * overlayOpacity <number>
+  
+  Returns <Promise\<Buffer\>>
+ 
+## Example
+
 ```javascript
 const fs = require('fs');
 const partyfy = require('partyfy');
@@ -16,3 +27,4 @@ const partyfy = require('partyfy');
   fs.writeFileSynce('my-party-image.gif');
 })();
 ```
+
