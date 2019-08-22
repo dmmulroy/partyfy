@@ -6,12 +6,12 @@
 
 ### `partyfy(file[, options])`
 
-  * file \<Buffer\>
-  * options \<Object\>
-    * frameDelay \<number\>
-    * overlayOpacity \<number\>
+  * file `<Buffer>`
+  * options `<Object>`
+    * frameDelay `<number>` Speed in milliseconds between frames
+    * overlayOpacity `<number>` Opacity of the overlayed party color (0 - 100)
   
-  Returns <Promise\<Buffer\>>
+  Returns `<Promise<Buffer>>`
  
 ## Example
 
