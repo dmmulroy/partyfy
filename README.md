@@ -6,10 +6,10 @@
 
 ### `partyfy(file[, options])`
 
-  * file <Buffer>
-  * options <Object>
-    * frameDelay <number>
-    * overlayOpacity <number>
+  * file \<Buffer\>
+  * options \<Object\>
+    * frameDelay \<number\>
+    * overlayOpacity \<number\>
   
   Returns <Promise\<Buffer\>>
  
