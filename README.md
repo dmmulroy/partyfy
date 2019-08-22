@@ -8,8 +8,8 @@
 
   * file `<Buffer>`
   * options `<Object>`
-    * frameDelay `<number>` Speed in milliseconds between frames
-    * overlayOpacity `<number>` Opacity of the overlayed party color (0 - 100)
+    * frameDelay `<number>` Speed in milliseconds between frames. Default: 75
+    * overlayOpacity `<number>` Opacity of the overlayed party color (0 - 100). Default: 60
   
   Returns `<Promise<Buffer>>`
  
