@@ -28,3 +28,6 @@ const partyfy = require('partyfy');
 })();
 ```
 
+## npx (experimental)
+`npx partyfy my-image.png my-party-image.gif`
+
