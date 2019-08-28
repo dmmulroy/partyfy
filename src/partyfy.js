@@ -26,11 +26,18 @@ async function partyfy(imageBuffer, options = defaultOptions) {
   try {
     const opts = { ...defaultOptions, ...options };
     const bitmap = await asyncGetPixelBitmap(imageBuffer);
-    const frames = Array.from(new Array(colors.length)).map(() => ({
-      width: bitmap.width,
-      height: bitmap.height,
-      data: Buffer.alloc(bitmap.data.length)
-    }));
+
+    const frames = Array.from(new Array(colors.length)).map(
+      () =>
+        new GifFrame(
+          {
+            width: bitmap.width,
+            height: bitmap.height,
+            data: Buffer.alloc(bitmap.data.length)
+          },
+          { delayCentisecs: msToCs(75) }
+        )
+    );
 
     for (let idx = 0; idx < bitmap.data.length; idx += 4) {
       let pixel = toRGBA(bitmap.data.slice(idx, idx + 5));
@@ -41,25 +48,17 @@ async function partyfy(imageBuffer, options = defaultOptions) {
           opts.opacity
         );
 
-        frames[colorIdx].data[idx] = transformedPixel.r;
-        frames[colorIdx].data[idx + 1] = transformedPixel.g;
-        frames[colorIdx].data[idx + 2] = transformedPixel.b;
-        frames[colorIdx].data[idx + 3] = transformedPixel.a;
+        frames[colorIdx].bitmap.data[idx] = transformedPixel.r;
+        frames[colorIdx].bitmap.data[idx + 1] = transformedPixel.g;
+        frames[colorIdx].bitmap.data[idx + 2] = transformedPixel.b;
+        frames[colorIdx].bitmap.data[idx + 3] = transformedPixel.a;
       }
     }
 
-    const { buffer } = await codec.encodeGif(
-      frames.map(
-        frame =>
-          new GifFrame(frame, {
-            delayCentisecs: msToCs(opts.frameDelay)
-          })
-      )
-    );
+    const { buffer } = await codec.encodeGif(frames);
 
     return buffer;
   } catch (err) {
-    console.error(err);
     throw new Error(`partyfy error: ${err.message || err}`);
   }
 }
@@ -68,15 +67,16 @@ async function partyfy(imageBuffer, options = defaultOptions) {
 function asyncGetPixelBitmap(imageBuffer) {
   return new Promise((resolve, reject) => {
     try {
-      getPixels(
-        imageBuffer,
-        fileType(imageBuffer).mime,
-        (err, { data, shape }) => {
-          if (err) return reject(err);
+      const { mime } = fileType(imageBuffer);
+      getPixels(imageBuffer, mime, (err, { data, shape }) => {
+        if (err) return reject(err);
 
-          resolve({ width: shape[0], height: shape[1], data });
+        if (shape.length === 4) {
+          return reject('animated gifs are not currently supported');
         }
-      );
+
+        resolve({ width: shape[0], height: shape[1], data });
+      });
     } catch (err) {
       reject(err);
     }
@@ -88,7 +88,7 @@ function toRGBA([r, g, b, a]) {
 }
 
 function setAlpha({ r, g, b, a }) {
-  return { r, g, b, a: a >= 255 ? 255 : 0x00 };
+  return { r, g, b, a: a < 127 ? 0x00 : 255 };
 }
 
 // Based on luminosity grayscale here: https://docs.gimp.org/2.6/en/gimp-tool-desaturate.html
@@ -114,13 +114,17 @@ function mix(color, overlayedColor, opacity = 60) {
 }
 
 function transformPixel(pixel, partyColor, opacity = 60) {
-  const p = mix(grayscale(setAlpha(pixel)), partyColor, opacity);
+  const p = mix(setAlpha(grayscale(pixel)), partyColor, opacity);
 
   return p;
 }
 
 function msToCs(ms) {
   return ms / 10;
+}
+
+function bytesToMb(bytes) {
+  return bytes / Math.pow(1024, 2);
 }
 
 module.exports = partyfy;
