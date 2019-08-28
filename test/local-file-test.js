@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const partyfy = require('../src/partyfy');
+const partyfy = require('../src/partyfy.v2');
 
 async function main() {
   const [, , inputFile, outputFile] = process.argv;

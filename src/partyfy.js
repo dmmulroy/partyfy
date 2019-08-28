@@ -36,7 +36,9 @@ async function partyfy(imageBuffer, options = defaultOptions) {
         throw new Error('animated gifs are not currently supported');
     }
 
-    image.greyscale();
+    console.log([...image.bitmap.data]);
+
+    // image.greyscale();
 
     colors.forEach(partyColor => {
       const clonedImage = image.clone();
@@ -68,7 +70,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
       );
 
       frames.push(
-        new GifFrame(clonedImage.bitmap, {
+        new GifFrame(image.bitmap, {
           delayCentisecs: msToCs(opts.frameDelay)
         })
       );
