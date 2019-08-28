@@ -99,4 +99,7 @@ output_images/
 # dist
 dist/
 
+# .DS_Store
+.DS_Store
+
 # End of https://www.gitignore.io/api/node
