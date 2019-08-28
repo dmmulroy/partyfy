@@ -33,7 +33,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
     }));
 
     for (let idx = 0; idx < bitmap.data.length; idx += 4) {
-      let pixel = toRGBAObject(bitmap.data.slice(idx, idx + 5));
+      let pixel = toRGBA(bitmap.data.slice(idx, idx + 5));
       for (let colorIdx = 0; colorIdx < colors.length; colorIdx++) {
         const transformedPixel = transformPixel(
           pixel,
@@ -83,12 +83,8 @@ function asyncGetPixelBitmap(imageBuffer) {
   });
 }
 
-function toRGBAObject([r, g, b, a]) {
+function toRGBA([r, g, b, a]) {
   return { r, g, b, a };
-}
-
-function toRGBAArray({ r, g, b, a }) {
-  return [r, g, b, a];
 }
 
 function setAlpha({ r, g, b, a }) {
@@ -96,13 +92,13 @@ function setAlpha({ r, g, b, a }) {
 }
 
 // Based on luminosity grayscale here: https://docs.gimp.org/2.6/en/gimp-tool-desaturate.html
-function grayscaleV1({ r, g, b, a }) {
-  const grayLevel = 0.21 * r + 0.72 * g + 0.07 * b;
+function grayscale({ r, g, b, a }) {
+  const grayLevel = parseInt(0.21 * r + 0.72 * g + 0.07 * b, 10);
 
   return { r: grayLevel, g: grayLevel, b: grayLevel, a };
 }
 
-function grayscale({ r, g, b, a }) {
+function grayscaleAverage({ r, g, b, a }) {
   const average = (r + g + b) / 3;
 
   return { r: average, g: average, b: average, a };
@@ -118,7 +114,9 @@ function mix(color, overlayedColor, opacity = 60) {
 }
 
 function transformPixel(pixel, partyColor, opacity = 60) {
-  return mix(grayscale(setAlpha(pixel)), partyColor, opacity);
+  const p = mix(grayscale(setAlpha(pixel)), partyColor, opacity);
+
+  return p;
 }
 
 function msToCs(ms) {
