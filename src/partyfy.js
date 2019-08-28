@@ -35,7 +35,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
             height: bitmap.height,
             data: Buffer.alloc(bitmap.data.length)
           },
-          { delayCentisecs: msToCs(75) }
+          { delayCentisecs: msToCs(opts.frameDelay) }
         )
     );
 
