@@ -45,7 +45,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
         const transformedPixel = transformPixel(
           pixel,
           colors[colorIdx],
-          opts.opacity
+          opts.overlayOpacity
         );
 
         frames[colorIdx].bitmap.data[idx] = transformedPixel.r;
@@ -114,9 +114,7 @@ function mix(color, overlayedColor, opacity = 60) {
 }
 
 function transformPixel(pixel, partyColor, opacity = 60) {
-  const p = mix(setAlpha(grayscale(pixel)), partyColor, opacity);
-
-  return p;
+  return mix(grayscale(setAlpha(pixel)), partyColor, opacity);
 }
 
 function msToCs(ms) {
