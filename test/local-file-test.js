@@ -8,7 +8,7 @@ async function main() {
   try {
     const imageFile = fs.readFileSync(path.resolve(inputFile));
 
-    const partyImage = await partyfy(imageFile, { overlayOpacity: 100 });
+    const partyImage = await partyfy(imageFile);
 
     fs.writeFileSync(path.resolve(outputFile), partyImage);
   } catch (err) {
