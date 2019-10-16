@@ -16,7 +16,6 @@ const main = () => {
       .usage('<source> <dest> [options]')
       .arguments('<sourceFile> <destFile>')
       .action(async (source, dest) => {
-        console.log(program.delay);
         try {
           const imageFile = fs.readFileSync(path.resolve(source));
 
