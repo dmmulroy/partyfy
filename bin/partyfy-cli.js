@@ -2,18 +2,53 @@
 const path = require('path');
 const fs = require('fs');
 
+const program = require('commander');
+
 const partyfy = require('../dist/partyfy.cjs');
+const pkg = require('../package.json');
 
-(async () => {
-  const [, , inputFile, outputFile] = process.argv;
+const main = () => {
   try {
-    const imageFile = fs.readFileSync(path.resolve(inputFile));
+    program
+      .version(pkg.version)
+      .name('partyfy')
+      .description('A CLI for Partyfy.')
+      .usage('<source> <dest> [options]')
+      .arguments('<sourceFile> <destFile>')
+      .action(async (source, dest) => {
+        console.log(program.delay);
+        try {
+          const imageFile = fs.readFileSync(path.resolve(source));
 
-    const partyImage = await partyfy(imageFile);
+          const partyImage = await partyfy(imageFile, {
+            frameDelay: program.delay,
+            overlayOpacity: clamp(program.opacity, 100, 0)
+          });
 
-    fs.writeFileSync(path.resolve(outputFile), partyImage);
-    console.log(`${outputFile} succesfully created!`);
+          fs.writeFileSync(path.resolve(dest), partyImage);
+          console.log(`${dest} succesfully created!`);
+        } catch (err) {
+          console.log(err);
+        }
+      })
+      .option(
+        '-d, --delay <ms>',
+        'The Speed in milliseconds between frames. Default: 75',
+        75
+      )
+      .option(
+        '-o, --opacity <value>',
+        'Opacity of the overlayed party color (0 - 100). Default: 60',
+        60
+      )
+      .parse(process.argv);
   } catch (err) {
     console.log(err);
   }
-})();
+};
+
+main();
+
+function clamp(value, max, min) {
+  return Math.max(min, Math.min(value, max));
+}
