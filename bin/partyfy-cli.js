@@ -12,7 +12,7 @@ const main = () => {
     program
       .version(pkg.version)
       .name('partyfy')
-      .description('A CLI for Partyfy.')
+      .description('A CLI for partyfy.')
       .usage('<source> <dest> [options]')
       .arguments('<sourceFile> <destFile>')
       .action(async (source, dest) => {
@@ -33,12 +33,12 @@ const main = () => {
       })
       .option(
         '-d, --delay <ms>',
-        'The Speed in milliseconds between frames. Default: 75',
+        'The Speed in milliseconds between frames.',
         75
       )
       .option(
         '-o, --opacity <value>',
-        'Opacity of the overlayed party color (0 - 100). Default: 60',
+        'Opacity of the overlayed party color (0 - 100).',
         60
       )
       .parse(process.argv);
