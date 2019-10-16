@@ -28,6 +28,18 @@ const partyfy = require('partyfy');
 })();
 ```
 
-## npx (experimental)
-`npx partyfy my-image.png my-party-image.gif`
+## npx/cli
+
+`npx partyfy` or `npm i partyfy -G`
+```
+Usage: partyfy <source> <dest> [options]
+
+A CLI for partyfy.
+
+Options:
+  -V, --version          output the version number
+  -d, --delay <ms>       The Speed in milliseconds between frames. (default: 75)
+  -o, --opacity <value>  Opacity of the overlayed party color (0 - 100). (default: 60)
+  -h, --help             output usage information
+```
 
