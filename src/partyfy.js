@@ -1,6 +1,6 @@
 const getPixels = require('get-pixels');
 const fileType = require('file-type');
-const { GifCodec, GifFrame } = require('gifwrap');
+const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
 
 const codec = new GifCodec();
 
@@ -25,35 +25,23 @@ const defaultOptions = {
 async function partyfy(imageBuffer, options = defaultOptions) {
   try {
     const opts = { ...defaultOptions, ...options };
-    const bitmap = await asyncGetPixelBitmap(imageBuffer);
+    const frames = await readFrames(imageBuffer, opts);
 
-    const frames = Array.from(new Array(colors.length)).map(
-      () =>
-        new GifFrame(
-          {
-            width: bitmap.width,
-            height: bitmap.height,
-            data: Buffer.alloc(bitmap.data.length)
-          },
-          { delayCentisecs: msToCs(opts.frameDelay) }
-        )
-    );
+    frames.forEach(({ bitmap }, frameIdx) => {
+      for (let idx = 0; idx < bitmap.data.length; idx += 4) {
+        let pixel = toRGBA(bitmap.data.slice(idx, idx + 5));
 
-    for (let idx = 0; idx < bitmap.data.length; idx += 4) {
-      let pixel = toRGBA(bitmap.data.slice(idx, idx + 5));
-      for (let colorIdx = 0; colorIdx < colors.length; colorIdx++) {
-        const transformedPixel = transformPixel(
+        const { r, g, b, a } = transformPixel(
           pixel,
-          colors[colorIdx],
+          colors[frameIdx % colors.length],
           opts.overlayOpacity
         );
 
-        frames[colorIdx].bitmap.data[idx] = transformedPixel.r;
-        frames[colorIdx].bitmap.data[idx + 1] = transformedPixel.g;
-        frames[colorIdx].bitmap.data[idx + 2] = transformedPixel.b;
-        frames[colorIdx].bitmap.data[idx + 3] = transformedPixel.a;
+        [r, g, b, a].forEach((channel, i) => {
+          bitmap.data[idx + i] = channel
+        })
       }
-    }
+    })
 
     const { buffer } = await codec.encodeGif(frames);
 
@@ -63,24 +51,34 @@ async function partyfy(imageBuffer, options = defaultOptions) {
   }
 }
 
-// Returns a gifwrap/jimp compatible Bitmap object
-function asyncGetPixelBitmap(imageBuffer) {
-  return new Promise((resolve, reject) => {
-    try {
-      const { mime } = fileType(imageBuffer);
-      getPixels(imageBuffer, mime, (err, { data, shape }) => {
-        if (err) return reject(err);
+// Returns gifwrap/jimp compatible frames
+function readFrames(imageBuffer, opts) {
+  const { mime } = fileType(imageBuffer);
 
-        if (shape.length === 4) {
-          return reject('animated gifs are not currently supported');
+  switch (mime) {
+    case 'image/gif':
+      return GifUtil.read(imageBuffer).then(gif => gif.frames)
+    case 'image/png':
+      return new Promise((resolve, reject) => {
+        try {
+          getPixels(imageBuffer, mime, (err, { data, shape }) => {
+            if (err) return reject(err);
+
+            resolve(colors.map(() => new GifFrame({
+              width: shape[0],
+              height: shape[1],
+              data: Buffer.from(data),
+            },
+            { delayCentisecs: msToCs(opts.frameDelay) }
+            )))
+          });
+        } catch (err) {
+          reject(err);
         }
-
-        resolve({ width: shape[0], height: shape[1], data });
       });
-    } catch (err) {
-      reject(err);
-    }
-  });
+  }
+
+  throw new Error('Invalid file format.')
 }
 
 function toRGBA([r, g, b, a]) {
@@ -98,12 +96,6 @@ function grayscale({ r, g, b, a }) {
   return { r: grayLevel, g: grayLevel, b: grayLevel, a };
 }
 
-function grayscaleAverage({ r, g, b, a }) {
-  const average = (r + g + b) / 3;
-
-  return { r: average, g: average, b: average, a };
-}
-
 function mix(color, overlayedColor, opacity = 60) {
   return {
     r: (overlayedColor.r - color.r) * (opacity / 100) + color.r,
@@ -119,10 +111,6 @@ function transformPixel(pixel, partyColor, opacity = 60) {
 
 function msToCs(ms) {
   return ms / 10;
-}
-
-function bytesToMb(bytes) {
-  return bytes / Math.pow(1024, 2);
 }
 
 module.exports = partyfy;

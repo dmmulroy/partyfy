@@ -19,6 +19,10 @@ const main = () => {
         try {
           const imageFile = fs.readFileSync(path.resolve(source));
 
+          if (source.endsWith('.gif')) {
+            console.warn('Warning: frameDelay is currently ignored for .gif files.\n')
+          }
+
           const partyImage = await partyfy(imageFile, {
             frameDelay: program.delay,
             overlayOpacity: clamp(program.opacity, 100, 0)
