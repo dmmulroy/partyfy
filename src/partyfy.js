@@ -57,22 +57,22 @@ async function readFrames(imageBuffer, opts) {
 
   switch (mime) {
     case 'image/gif': {
-      const { frames } = await GifUtil.read(imageBuffer)
-      const frameCount = frames.length
+      const { frames } = await GifUtil.read(imageBuffer);
 
-      if (frameCount > 1) {
+      if (frames.length > 1) {
         if (opts.frameDelay != defaultOptions.frameDelay) {
-          console.warn('Warning: frameDelay is currently ignored for animated gifs.\n')
+          console.warn('Warning: frameDelay is currently ignored for animated gifs.\n');
         }
 
-        return frames
+        return frames;
       } else {
         return colors.map(() => new GifFrame(new BitmapImage(frames[0]),
           { delayCentisecs: msToCs(opts.frameDelay) }
-        ))
+        ));
       }
     }
     case 'image/png': 
+    case 'image/jpg':
       return new Promise((resolve, reject) => {
         try {
           getPixels(imageBuffer, mime, (err, { data, shape }) => {
