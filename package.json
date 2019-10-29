@@ -1,6 +1,6 @@
 {
   "name": "partyfy",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A Node.js library for generating rainbow party gifs",
   "main": "dist/partyfy.cjs.js",
   "module": "dist/partyfy.esm.js",
