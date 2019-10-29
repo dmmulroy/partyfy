@@ -1,6 +1,6 @@
 const getPixels = require('get-pixels');
 const fileType = require('file-type');
-const { GifCodec, GifFrame, GifUtil } = require('gifwrap');
+const { GifCodec, GifFrame, GifUtil, BitmapImage } = require('gifwrap');
 
 const codec = new GifCodec();
 
@@ -52,13 +52,27 @@ async function partyfy(imageBuffer, options = defaultOptions) {
 }
 
 // Returns gifwrap/jimp compatible frames
-function readFrames(imageBuffer, opts) {
+async function readFrames(imageBuffer, opts) {
   const { mime } = fileType(imageBuffer);
 
   switch (mime) {
-    case 'image/gif':
-      return GifUtil.read(imageBuffer).then(gif => gif.frames)
-    case 'image/png':
+    case 'image/gif': {
+      const { frames } = await GifUtil.read(imageBuffer)
+      const frameCount = frames.length
+
+      if (frameCount > 1) {
+        if (opts.frameDelay != defaultOptions.frameDelay) {
+          console.warn('Warning: frameDelay is currently ignored for animated gifs.\n')
+        }
+
+        return frames
+      } else {
+        return colors.map(() => new GifFrame(new BitmapImage(frames[0]),
+          { delayCentisecs: msToCs(opts.frameDelay) }
+        ))
+      }
+    }
+    case 'image/png': 
       return new Promise((resolve, reject) => {
         try {
           getPixels(imageBuffer, mime, (err, { data, shape }) => {
