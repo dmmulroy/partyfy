@@ -6,14 +6,22 @@
 
 ### `partyfy(file[, options])`
 
-  * file `<Buffer>`
-  * options `<Object>`
-    * frameDelay `<number>` Speed in milliseconds between frames. Default: 75
-    * overlayOpacity `<number>` Opacity of the overlayed party color (0 - 100). Default: 60
-  
-  Returns `<Promise<Buffer>>`
- 
+- file `<Buffer>`
+- options `<Object>`
+  - frameDelay `<number>` Speed in milliseconds between frames. Default: 75
+  - overlayOpacity `<number>` Opacity of the overlayed party color (0 - 100). Default: 60
+
+Returns `<Promise<Buffer>>`
+
 ## Example
+
+### Before
+
+![Before](https://i.imgur.com/vdzHTvI.png)
+
+### After
+
+![AFter](https://i.imgur.com/oIZtzvg.gif)
 
 ```javascript
 const fs = require('fs');
@@ -31,6 +39,7 @@ const partyfy = require('partyfy');
 ## npx/cli
 
 `npx partyfy` or `npm i partyfy -G`
+
 ```
 Usage: partyfy <source> <dest> [options]
 
@@ -42,4 +51,3 @@ Options:
   -o, --opacity <value>  Opacity of the overlayed party color (0 - 100). (default: 60)
   -h, --help             output usage information
 ```
-
