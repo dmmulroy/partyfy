@@ -54,7 +54,6 @@ async function partyfy(imageBuffer, options = defaultOptions) {
 // Returns gifwrap/jimp compatible frames
 async function readFrames(imageBuffer, opts) {
   const { mime } = fileType(imageBuffer);
-  console.log('mime', mime);
 
   switch (mime) {
     case 'image/gif': {
