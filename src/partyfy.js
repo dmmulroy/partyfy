@@ -38,10 +38,10 @@ async function partyfy(imageBuffer, options = defaultOptions) {
         );
 
         [r, g, b, a].forEach((channel, i) => {
-          bitmap.data[idx + i] = channel
-        })
+          bitmap.data[idx + i] = channel;
+        });
       }
-    })
+    });
 
     const { buffer } = await codec.encodeGif(frames);
 
@@ -54,6 +54,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
 // Returns gifwrap/jimp compatible frames
 async function readFrames(imageBuffer, opts) {
   const { mime } = fileType(imageBuffer);
+  console.log('mime', mime);
 
   switch (mime) {
     case 'image/gif': {
@@ -61,30 +62,42 @@ async function readFrames(imageBuffer, opts) {
 
       if (frames.length > 1) {
         if (opts.frameDelay != defaultOptions.frameDelay) {
-          console.warn('Warning: frameDelay is currently ignored for animated gifs.\n');
+          console.warn(
+            'Warning: frameDelay is currently ignored for animated gifs.\n'
+          );
         }
 
         return frames;
       } else {
-        return colors.map(() => new GifFrame(new BitmapImage(frames[0]),
-          { delayCentisecs: msToCs(opts.frameDelay) }
-        ));
+        return colors.map(
+          () =>
+            new GifFrame(new BitmapImage(frames[0]), {
+              delayCentisecs: msToCs(opts.frameDelay)
+            })
+        );
       }
     }
-    case 'image/png': 
+    case 'image/png':
     case 'image/jpg':
+    case 'image/jpeg':
       return new Promise((resolve, reject) => {
         try {
           getPixels(imageBuffer, mime, (err, { data, shape }) => {
             if (err) return reject(err);
 
-            resolve(colors.map(() => new GifFrame({
-              width: shape[0],
-              height: shape[1],
-              data: Buffer.from(data),
-            },
-            { delayCentisecs: msToCs(opts.frameDelay) }
-            )))
+            resolve(
+              colors.map(
+                () =>
+                  new GifFrame(
+                    {
+                      width: shape[0],
+                      height: shape[1],
+                      data: Buffer.from(data)
+                    },
+                    { delayCentisecs: msToCs(opts.frameDelay) }
+                  )
+              )
+            );
           });
         } catch (err) {
           reject(err);
@@ -92,7 +105,7 @@ async function readFrames(imageBuffer, opts) {
       });
   }
 
-  throw new Error('Invalid file format.')
+  throw new Error('Invalid file format.');
 }
 
 function toRGBA([r, g, b, a]) {
