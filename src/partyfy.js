@@ -2,8 +2,6 @@ const getPixels = require('get-pixels');
 const fileType = require('file-type');
 const { GifCodec, GifFrame, GifUtil, BitmapImage } = require('gifwrap');
 
-const codec = new GifCodec();
-
 const colors = [
   { r: 255, g: 141, b: 139 },
   { r: 254, g: 214, b: 137 },
@@ -14,12 +12,12 @@ const colors = [
   { r: 255, g: 140, b: 255 },
   { r: 255, g: 104, b: 247 },
   { r: 254, g: 108, b: 183 },
-  { r: 255, g: 105, b: 104 }
+  { r: 255, g: 105, b: 104 },
 ];
 
 const defaultOptions = {
   overlayOpacity: 60,
-  frameDelay: 75
+  frameDelay: 75,
 };
 
 async function partyfy(imageBuffer, options = defaultOptions) {
@@ -43,6 +41,7 @@ async function partyfy(imageBuffer, options = defaultOptions) {
       }
     });
 
+    const codec = new GifCodec();
     const { buffer } = await codec.encodeGif(frames);
 
     return buffer;
@@ -71,7 +70,7 @@ async function readFrames(imageBuffer, opts) {
         return colors.map(
           () =>
             new GifFrame(new BitmapImage(frames[0]), {
-              delayCentisecs: msToCs(opts.frameDelay)
+              delayCentisecs: msToCs(opts.frameDelay),
             })
         );
       }
@@ -91,7 +90,7 @@ async function readFrames(imageBuffer, opts) {
                     {
                       width: shape[0],
                       height: shape[1],
-                      data: Buffer.from(data)
+                      data: Buffer.from(data),
                     },
                     { delayCentisecs: msToCs(opts.frameDelay) }
                   )
@@ -127,7 +126,7 @@ function mix(color, overlayedColor, opacity = 60) {
     r: (overlayedColor.r - color.r) * (opacity / 100) + color.r,
     g: (overlayedColor.g - color.g) * (opacity / 100) + color.g,
     b: (overlayedColor.b - color.b) * (opacity / 100) + color.b,
-    a: color.a
+    a: color.a,
   };
 }
 
